@@ -8,7 +8,7 @@ TOKEN = 'your_token_here'
 # Replace with the username of the Telegram user you want to sync with
 USERNAME = 'your_username_here'
 
-# Replace with the path of the local folder you want to sync
+# Replace with the path of the local folder you want to sync please provide an absolute path
 FOLDER_PATH = 'your_folder_path_here'
 
 # Define the maximum file size (in bytes) that can be uploaded to Telegram
