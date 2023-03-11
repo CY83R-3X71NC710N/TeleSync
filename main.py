@@ -1,104 +1,85 @@
 import os
-import io
-import zipfile
-import tempfile
-import schedule
 import time
-import telegram
-from telegram.ext import Updater, CommandHandler, CallbackContext
+from Crypto.Cipher import AES
+from telethon import TelegramClient, events
 
-# Replace with your own Telegram bot token
-TOKEN = 'your_token_here'
+# Telegram API credentials
+api_id = 'your_api_id'
+api_hash = 'your_api_hash'
+phone_number = 'your_phone_number'
 
-# Replace with the username of the Telegram user you want to sync with
-USERNAME = 'your_username_here'
+# Encryption key and initialization vector
+key = b'your_encryption_key'
+iv = b'your_initialization_vector'
 
-# Replace with the path of the local folder you want to sync
-FOLDER_PATH = 'your_folder_path_here'
+# Maximum file size in bytes
+max_file_size = 1900000000
 
-# Define the maximum file size (in bytes) that can be uploaded to Telegram
-MAX_FILE_SIZE = 50 * 1024 * 1024
+# Folder path to upload files from
+folder_path = 'path_to_folder'
 
-# Create a Telegram bot instance
-bot = telegram.Bot(token=TOKEN)
+# Telegram client initialization
+client = TelegramClient('session_name', api_id, api_hash)
 
-# Define a function to handle the /sync command
-def sync(update, context):
-    # Get the list of files in the local folder
-    filenames = os.listdir(FOLDER_PATH)
-    
-    # Filter the files based on their extension
-    filtered_filenames = [filename for filename in filenames if filename.endswith('.pdf') or filename.endswith('.jpg')]
-    
-    # Check if there are any files to sync
-    if not filtered_filenames:
-        update.message.reply_text('No files found to sync.')
-        return
-    
-    # Create a temporary directory to store the compressed files
-    with tempfile.TemporaryDirectory() as tempdir:
-        # Compress the files into a ZIP archive
-        archive_path = os.path.join(tempdir, 'archive.zip')
-        with zipfile.ZipFile(archive_path, 'w', zipfile.ZIP_DEFLATED) as archive:
-            for filename in filtered_filenames:
-                filepath = os.path.join(FOLDER_PATH, filename)
-                archive.write(filepath, filename)
-                
-        # Encrypt the ZIP archive with a password
-        password = 'your_password_here'
-        encrypted_archive_path = os.path.join(tempdir, 'archive.zip.enc')
-        with open(archive_path, 'rb') as f_in, open(encrypted_archive_path, 'wb') as f_out:
-            data = f_in.read()
-            f_out.write(bytes([i ^ ord(password[i % len(password)]) for i in range(len(data))]))
-        
-        # Split the encrypted archive into chunks if it's too large to upload
-        if os.path.getsize(encrypted_archive_path) > MAX_FILE_SIZE:
-            with open(encrypted_archive_path, 'rb') as f:
-                # Calculate the number of chunks needed to upload the file
-                num_chunks = (os.path.getsize(encrypted_archive_path) + MAX_FILE_SIZE - 1) // MAX_FILE_SIZE
-                
-                # Upload each chunk as a separate file
-                for i in range(num_chunks):
-                    chunk = f.read(MAX_FILE_SIZE)
-                    bot.send_document(chat_id=USERNAME, document=telegram.InputFile(io.BytesIO(chunk), filename=f'archive_{i+1}.zip.enc'))
-        else:
-            # Send the file to the Telegram chat
-            with open(encrypted_archive_path, 'rb') as f:
-                bot.send_document(chat_id=USERNAME, document=f)
+# Encryption function
+def encrypt_file(file_path):
+    with open(file_path, 'rb') as f:
+        data = f.read()
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    padded_data = data + b'\0' * (AES.block_size - len(data) % AES.block_size)
+    encrypted_data = cipher.encrypt(padded_data)
+    with open(file_path, 'wb') as f:
+        f.write(encrypted_data)
 
-    # Send a confirmation message
-    update.message.reply_text('Sync complete!')
+# Decryption function
+def decrypt_file(file_path):
+    with open(file_path, 'rb') as f:
+        encrypted_data = f.read()
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    decrypted_data = cipher.decrypt(encrypted_data)
+    with open(file_path, 'wb') as f:
+        f.write(decrypted_data.rstrip(b'\0'))
 
-# Define a function to handle the /schedule_sync command
-def schedule_sync(update, context):
-    # Define the sync interval (in seconds)
-    interval = 60 * 60 * 24 # 24 hours
-    
-    # Schedule the sync to run at the specified interval
-    schedule.every(interval).seconds.do(sync, update=update, context=context)
-    
-    # Send a confirmation message
-    update.message.reply_text('Sync unscheduled.')
-# Define a function to handle errors
-def error(update, context):
-    """Log the error and send a message to the chat."""
-    logger.warning(f'Update {update} caused error {context.error}')
-    update.message.reply_text(f'An error occurred: {context.error}')
+# File splitting function
+def split_file(file_path):
+    file_size = os.path.getsize(file_path)
+    if file_size <= max_file_size:
+        return [file_path]
+    else:
+        parts = []
+        with open(file_path, 'rb') as f:
+            index = 0
+            while True:
+                part_path = f'{file_path}.part{index}'
+                part_size = min(max_file_size, file_size - index * max_file_size)
+                if part_size == 0:
+                    break
+                with open(part_path, 'wb') as part:
+                    part.write(f.read(part_size))
+                parts.append(part_path)
+                index += 1
+        return parts
 
-# Set up the Telegram bot handlers
-updater = Updater(TOKEN, use_context=True)
-dispatcher = updater.dispatcher
-dispatcher.add_handler(CommandHandler('sync', sync))
-dispatcher.add_handler(CommandHandler('schedule_sync', schedule_sync))
-dispatcher.add_handler(CommandHandler('unschedule_sync', unschedule_sync))
-dispatcher.add_error_handler(error)
+# Telegram file upload function
+async def upload_file(file_path):
+    async with client:
+        async with client.conversation('user_username') as conv:
+            await conv.send_file(file_path)
 
-# Start the Telegram bot
-updater.start_polling()
-print('Telegram bot started.')
+# Main function
+async def main():
+    while True:
+        for file_name in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, file_name)
+            if os.path.isfile(file_path):
+                encrypt_file(file_path)
+                file_parts = split_file(file_path)
+                for part_path in file_parts:
+                    await upload_file(part_path)
+                    os.remove(part_path)
+                decrypt_file(file_path)
+        time.sleep(3600)
 
-# Start the scheduler
-while True:
-    schedule.run_pending()
-    time.sleep(1)
-
+# Start the script
+client.start(phone_number)
+client.loop.run_until_complete(main())
