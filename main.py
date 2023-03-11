@@ -1,110 +1,102 @@
-# Create code for a telegram script in python that grabs all files in a directory encrypts them and them uploads the files to telegram, however the files should be split into mutiple files if they are above 1.9GB and the script should ask questions such as if you would like to upload or decrypt a file. Decryption should take a file that was uploaded to telegram and decrypt it based on the file location. The script should sync every hour.
-
-# Import the required modules including the module we will use to access telegram as a user and not a bot
 import os
-import time
-import pyAesCrypt
-import pyrogram
-from pyrogram import Client, filters
-from pyrogram.types import Message
+import zipfile
+import math
+import telegram
+from telegram.ext import Updater, CommandHandler
+from datetime import datetime, timedelta
 
-# Create a function that will encrypt the files
-def encrypt_file(file, password):
-    # Create a buffer size for the encryption
-    bufferSize = 64 * 1024
-    # Create a variable for the encrypted file
-    encrypted_file = file + ".aes"
-    # Encrypt the file
-    pyAesCrypt.encryptFile(file, encrypted_file, password, bufferSize)
-    # Delete the original file
-    os.remove(file)
+# Set the path of the folder to sync
+folder_path = '/path/to/folder'
 
-# Create a function that will decrypt the files
-def decrypt_file(file, password):
-    # Create a buffer size for the decryption
-    bufferSize = 64 * 1024
-    # Create a variable for the decrypted file
-    decrypted_file = file.replace(".aes", "")
-    # Decrypt the file
-    pyAesCrypt.decryptFile(file, decrypted_file, password, bufferSize)
-    # Delete the original file
-    os.remove(file)
+# Set the maximum file size for splitting
+max_file_size = 1.9 * 1024 * 1024 * 1024
 
-# Ask the user if they want to decrypt a file they encrypted or proceed with the rest of the script
-decrypt = input("Would you like to decrypt a file you encrypted? (y/n): ")
-if decrypt == "y":
-    # Ask the user for the password they used to encrypt the file
-    password = input("Please enter the password you used to encrypt the file: ")
-    # Ask the user for the file they wish to decrypt
-    file = input("Please enter the file you wish to decrypt: ")
-    # Decrypt the file
-    decrypt_file(file, password)
-    # Exit the script
-    exit()
-if decrypt == "n":
-    pass
+# Set the Telegram bot token
+bot_token = 'YOUR_BOT_TOKEN'
 
-# Ask the user for the password they wish to use
-password = input("Please enter the password you wish to use: ")
+# Set the Telegram chat ID to send the files to
+chat_id = 'YOUR_CHAT_ID'
 
-# ENCRYPT THE ENTIRE DIRECTORY AND EVERY SINGLE FILE INSIDE IT
-# Create a for loop that will loop through every file in the directory
-for file in os.listdir():
-    # Check if the file is a file and not a directory
-    if os.path.isfile(file):
-        # Check if the file is above 1.9GB
-        if os.path.getsize(file) > 2000000000:
-            # Create a variable for the file size
-            file_size = os.path.getsize(file)
-            # Create a variable for the number of parts the file will be split into
-            number_of_parts = file_size / 2000000000
-            # Create a variable for the size of each part
-            part_size = file_size / number_of_parts
-            # Create a variable for the current part
-            current_part = 1
-            # Create a variable for the current part size
-            current_part_size = 0
-            # Create a variable for the current part name
-            current_part_name = file + ".part" + str(current_part)
-            # Create a variable for the current part file
-            current_part_file = open(current_part_name, "wb")
-            # Create a variable for the current file
-            current_file = open(file, "rb")
-            # Create a variable for the current file data
-            current_file_data = current_file.read(1024)
-            # Create a while loop that will loop until the current part size is greater than the part size
-            while current_part_size < part_size:
-                # Write the current file data to the current part file
-                current_part_file.write(current_file_data)
-                # Add the current file data to the current part size
-                current_part_size += len(current_file_data)
-                # Read the next 1024 bytes of the current file
-                current_file_data = current_file.read(1024)
-                # Check if the current part size is greater than the part size
-                if current_part_size > part_size:
-                    # Close the current part file
-                    current_part_file.close()
-                    # Encrypt the current part file
-                    encrypt_file(current_part_name, password)
-                    # Increment the current part
-                    current_part += 1
-                    # Create a variable for the current part name
-                    current_part_name = file + ".part" + str(current_part)
-                    # Create a variable for the current part file
-                    current_part_file = open(current_part_name, "wb")
-                    # Create a variable for the current part size
-                    current_part_size = 0
-            # Close the current part file
-            current_part_file.close()
-            # Encrypt the current part file
-            encrypt_file(current_part_name, password)
-            # Close the current file
-            current_file.close()
-            # Delete the original file
-            os.remove(file)
-        # Check if the file is below 1.9GB
-        else:
-            # Encrypt the file
-            encrypt_file(file, password)
+# Create a Telegram bot instance
+bot = telegram.Bot(token=bot_token)
 
+# Define a function to encrypt and split the folder
+def encrypt_and_split_folder():
+    # Get the current date and time
+    now = datetime.now()
+    # Set the name of the zip file
+    zip_file_name = now.strftime('%Y-%m-%d_%H-%M-%S.zip')
+    # Set the path of the zip file
+    zip_file_path = os.path.join(folder_path, zip_file_name)
+    # Create a zip file instance
+    zip_file = zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED)
+    # Add all files in the folder to the zip file
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            zip_file.write(file_path, os.path.relpath(file_path, folder_path))
+    # Close the zip file
+    zip_file.close()
+    # Get the size of the zip file
+    zip_file_size = os.path.getsize(zip_file_path)
+    # Check if the zip file size is above the maximum file size
+    if zip_file_size > max_file_size:
+        # Calculate the number of parts needed to split the zip file
+        num_parts = math.ceil(zip_file_size / max_file_size)
+        # Calculate the size of each part
+        part_size = math.ceil(zip_file_size / num_parts)
+        # Open the zip file for reading
+        with open(zip_file_path, 'rb') as f:
+            # Loop through the parts
+            for i in range(num_parts):
+                # Set the name of the part file
+                part_file_name = f'{zip_file_name}.part{i+1}'
+                # Set the path of the part file
+                part_file_path = os.path.join(folder_path, part_file_name)
+                # Open the part file for writing
+                with open(part_file_path, 'wb') as part_file:
+                    # Write the part of the zip file to the part file
+                    part_file.write(f.read(part_size))
+                # Send the part file to the Telegram chat
+                bot.send_document(chat_id=chat_id, document=open(part_file_path, 'rb'))
+                # Delete the part file
+                os.remove(part_file_path)
+    else:
+        # Send the zip file to the Telegram chat
+        bot.send_document(chat_id=chat_id, document=open(zip_file_path, 'rb'))
+    # Delete the zip file
+    os.remove(zip_file_path)
 
+# Define a function to sync the folder and encrypt and split it
+def sync_and_encrypt_folder():
+    # Sync the folder
+    # ...
+    # Encrypt and split the folder
+    encrypt_and_split_folder()
+
+# Define a function to handle the /sync command
+def sync_command_handler(update, context):
+    # Sync the folder and encrypt and split it
+    sync_and_encrypt_folder()
+    # Send a message to the Telegram chat
+    context.bot.send_message(chat_id=update.effective_chat.id, text='Folder synced and encrypted')
+
+# Create an Updater instance
+updater = Updater(token=bot_token, use_context=True)
+
+# Create a CommandHandler instance for the /sync command
+sync_command_handler = CommandHandler('sync', sync_command_handler)
+
+# Add the CommandHandler instance to the Updater instance
+updater.dispatcher.add_handler(sync_command_handler)
+
+# Start the Updater instance
+updater.start_polling()
+
+# Schedule the sync_and_encrypt_folder function to run every hour
+schedule_interval = timedelta(hours=1)
+next_run_time = datetime.now() + schedule_interval
+while True:
+    if datetime.now() >= next_run_time:
+        sync_and_encrypt_folder()
+        next_run_time += schedule_interval
