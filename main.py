@@ -50,7 +50,7 @@ def split_file(file_path):
         with open(file_path, 'rb') as f:
             index = 0
             while True:
-                part_path = f'{file_path}.part{index}'
+                part_path = f'{file_path}.part{index + 1}'
                 part_size = min(max_file_size, file_size - index * max_file_size)
                 if part_size == 0:
                     break
@@ -74,7 +74,9 @@ async def main():
             if os.path.isfile(file_path):
                 encrypt_file(file_path)
                 file_parts = split_file(file_path)
-                for part_path in file_parts:
+                sorted_file_parts = sorted(file_parts)  # sort the list of file parts
+                for part_path in sorted_file_parts:
+                    encrypt_file(file_path)  # encrypt the file before uploading
                     await upload_file(part_path)
                     os.remove(part_path)
                 decrypt_file(file_path)
