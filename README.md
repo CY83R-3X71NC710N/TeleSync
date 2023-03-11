@@ -7,4 +7,5 @@ To clarify, many other solutions for backups are not "set and forget," which can
 ```
 https://pypi.org/project/python-telegram-bot/ pip install python-telegram-bot==13.7
 https://pypi.org/project/schedule/ pip install schedule
+https://telegram.me/BotFather
 ```
