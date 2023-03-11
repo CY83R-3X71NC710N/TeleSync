@@ -6,16 +6,16 @@ from telegram.ext import Updater, CommandHandler
 from datetime import datetime, timedelta
 
 # Set the path of the folder to sync
-folder_path = '/path/to/folder'
+folder_path = r'C:\Users\Admin\Desktop\evil'
 
 # Set the maximum file size for splitting
 max_file_size = 1.9 * 1024 * 1024 * 1024
 
 # Set the Telegram bot token
-bot_token = 'YOUR_BOT_TOKEN'
+bot_token = ''
 
 # Set the Telegram chat ID to send the files to
-chat_id = 'YOUR_CHAT_ID'
+chat_id = ''
 
 # Create a Telegram bot instance
 bot = telegram.Bot(token=bot_token)
@@ -92,6 +92,9 @@ updater.dispatcher.add_handler(sync_command_handler)
 
 # Start the Updater instance
 updater.start_polling()
+
+# Sync and encrypt folder once for the start of the script
+sync_and_encrypt_folder()
 
 # Schedule the sync_and_encrypt_folder function to run every hour
 schedule_interval = timedelta(hours=1)
