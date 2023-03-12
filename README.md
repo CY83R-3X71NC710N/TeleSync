@@ -59,4 +59,5 @@ https://docs.telethon.dev/en/stable/ (Telethon) pip3 install telethon
 https://www.python.org/ (Install python to windows path)
 https://kotatogram.github.io/ (Custom Telegram Client, good for high-speed download/upload if you need access to a file fast)
 https://gofile.io/ (Good for uploading files for projects and sharing with the rest of the world, essentially generating a public download link for others. The issue with this is that if the file is not downloaded a lot it will get removed from GoFile's servers, this is why you should use this as temporary public link or for projects that will be sure to have people actively downloading the file)
+https://teledriveapp.com/ (Good for uploading individual files but not good for backups and not lightweight)
 ```
