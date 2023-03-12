@@ -1,5 +1,5 @@
 @echo off
-set SCRIPTS_DIR=r"C:\TeleSync-main"
+set SCRIPTS_DIR="C:\TeleSync-main"
 cd /d "%SCRIPTS_DIR%"
 
 :: Check if the script is running as administrator
