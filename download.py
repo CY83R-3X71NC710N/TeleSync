@@ -3,14 +3,10 @@ import os
 import telegram
 from telegram.ext import Updater, CommandHandler
 
-# Define the token for your Telegram bot
-TOKEN = 'your_bot_token_here'
-
-# Define the ID of the Telegram channel you want to download from
-CHANNEL_ID = 'your_channel_id_here'
-
-# Define the path to the directory where you want to save the downloaded files
-DOWNLOAD_DIR = os.path.join(os.getcwd(), 'downloads')
+# Prompt the user to enter the bot token, channel ID, and download directory
+TOKEN = input('Enter your bot token: ')
+CHANNEL_ID = input('Enter the channel ID: ')
+DOWNLOAD_DIR = input('Enter the download directory: ')
 
 # Create the Telegram bot object
 bot = telegram.Bot(token=TOKEN)
