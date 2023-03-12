@@ -17,5 +17,5 @@ Please for back up your keys, if you do not your storage will be for naught do n
 # Resources: 
 ```
 https://7-zip.org/download.html
-https://github.com/Nekmo/telegram-upload
+https://github.com/Nekmo/telegram-upload pip3 install -U telegram-upload
 ```
