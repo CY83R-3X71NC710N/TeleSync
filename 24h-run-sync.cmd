@@ -1,4 +1,7 @@
 @echo off
+set SCRIPTS_DIR=r"C:\TeleSync-main"
+cd /d "%SCRIPTS_DIR%"
+
 :: Check if the script is running as administrator
 NET SESSION >NUL 2>&1
 IF %ERRORLEVEL% EQU 0 (
@@ -9,7 +12,6 @@ IF %ERRORLEVEL% EQU 0 (
     exit /b 1
 )
 
-cd /d "%~dp0"
 :loop
 powershell ./main.ps1
 python create-channel.py
