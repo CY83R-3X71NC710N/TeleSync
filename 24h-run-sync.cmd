@@ -2,5 +2,5 @@
 :loop
 powershell ./main.ps1
 python upload.py
-timeout /t 3600 /nobreak >nul
+timeout /t 86400 /nobreak >nul
 goto loop
