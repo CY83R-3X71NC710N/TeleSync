@@ -53,4 +53,5 @@ https://github.com/Nekmo/telegram-upload pip3 install -U telegram-upload
 https://my.telegram.org/apps (ID Values)
 https://docs.telethon.dev/en/stable/ (Telethon) pip3 install telethon
 https://www.python.org/ (Install python to windows path)
+https://kotatogram.github.io/ (Custom Telegram Client, good for high-speed download/upload if you need access to a file fast)
 ```
