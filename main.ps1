@@ -15,14 +15,22 @@ if (Test-Path $folderPath) {
 # Create the folder
 New-Item -ItemType Directory -Path $folderPath
 
-# Build the path to the 7-Zip executable
-$sevenZipPath = "C:\Program Files\7-Zip\7z.exe"
+# Define the name of the folder to compress and encrypt
+$folderToCompressName = "sync"
 
 # Build the path to the folder to compress and encrypt
-$folderToCompressPath = Join-Path $currentDirectory "sync"
+$folderToCompressPath = Join-Path $currentDirectory $folderToCompressName
+
+# Check if the folder to compress and encrypt exists and create it if it doesn't
+if (-not (Test-Path $folderToCompressPath)) {
+    New-Item -ItemType Directory -Path $folderToCompressPath
+}
 
 # Build the path to the output file
 $outputFilePath = Join-Path $folderPath "sync.7z"
+
+# Build the path to the 7-Zip executable
+$sevenZipPath = "C:\Program Files\7-Zip\7z.exe"
 
 # Compress and encrypt the folder using 7-Zip
 & $sevenZipPath a -t7z -m0=lzma2 -mx=9 -mfb=273 -md=256m -ms=on -pMyPassword -mhe=on $outputFilePath $folderToCompressPath
