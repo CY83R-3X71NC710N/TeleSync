@@ -21,12 +21,16 @@ async def main():
         megagroup=False
     ))
 
-    # Store the channel name in a text file
-    with open("channel_name.txt", "w") as f:
-        f.write(f"{channel_name}\n")
+    # Get the invite link to the channel
+    invite_link = await client(functions.messages.ExportChatInviteRequest(result.chats[0].id))
+
+    # Store the invite link in a text file
+    with open("channel_invite_link.txt", "w") as f:
+        f.write(f"{invite_link}\n")
 
     # Print the result
     print(f"Channel '{result.chats[0].title}' (id: {result.chats[0].id}) created successfully.")
+    print(f"Invite link: {invite_link.link}")
 
     # Logout
     await client.disconnect()
