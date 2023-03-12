@@ -38,6 +38,10 @@ Therefore, the date and time in the file name "backup-20230312_132606" represent
 
 TSA stands for TeleSync Archive and is in the preview of the files you upload.
 
+# How to download?:
+
+Running a powershell window in the folder simply run python download.ps1
+
 # Resources: 
 ```
 https://7-zip.org/download.html (Install on windows before running script this is used for the file operations)
