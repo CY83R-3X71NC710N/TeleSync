@@ -46,6 +46,10 @@ Running a powershell window in the folder simply run python download.ps1
 
 You can if the file is large enough to be split meaning it must be over 1.9GB this means that it is possible to set a password for the file before splitting and a password for the split files.
 
+# Channel Limit?
+
+Telegram has a 500 channel limit for free users and a 1000 channel limit for premium users, make sure to clear up channels or modify the upload script to save in DM if you hit a limit.
+
 # Resources: 
 ```
 https://7-zip.org/download.html (Install on windows before running script this is used for the file operations)
