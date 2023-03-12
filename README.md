@@ -42,6 +42,10 @@ TSA stands for TeleSync Archive and is in the preview of the files you upload.
 
 Running a powershell window in the folder simply run python download.ps1
 
+# Can you set two different passwords on the same file?:
+
+You can if the file is large enough to be split meaning it must be over 1.9GB this means that it is possible to set a password for the file before splitting and a password for the split files.
+
 # Resources: 
 ```
 https://7-zip.org/download.html (Install on windows before running script this is used for the file operations)
