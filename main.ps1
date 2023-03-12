@@ -27,31 +27,30 @@ $outputFilePath = Join-Path $folderPath "sync.7z"
 # Compress and encrypt the folder using 7-Zip
 & $sevenZipPath a -t7z -m0=lzma2 -mx=9 -mfb=273 -md=256m -ms=on -pMyPassword -mhe=on $outputFilePath $folderToCompressPath
 
-# Check if the output file is larger than 3.9GB and split it if necessary
-$maxFileSize = 3.9GB
+# Check if the output file is larger than 1.9GB and split it if necessary
+$maxFileSize = 1.9GB
 
-while ((Get-Item $outputFilePath).Length -gt $maxFileSize) {
-    $splitSize = $maxFileSize / 2 # Split the file into two parts
+if ((Get-Item $outputFilePath).Length -gt $maxFileSize) {
+    $splitSize = [Math]::Ceiling((Get-Item $outputFilePath).Length / ($maxFileSize * 1MB))
     $outputFileBaseName = [System.IO.Path]::GetFileNameWithoutExtension($outputFilePath)
     $outputFileExtension = [System.IO.Path]::GetExtension($outputFilePath)
 
     # Split the file using 7-Zip
-    & $sevenZipPath a -t7z -m0=lzma2 -mx=9 -mfb=273 -md=256m -ms=on -v$splitSize -pMyPassword -mhe=on "$folderPath\$outputFileBaseName.part" $outputFilePath
+    & $sevenZipPath a -t7z -m0=lzma2 -mx=9 -mfb=273 -md=256m -ms=on "-v1g" -pMyPassword -mhe=on "${outputFilePath}.split" "${outputFilePath}"
 
-    # Delete the original output file
+    # Delete the original file
     Remove-Item $outputFilePath
 
-    # Rename the split files to remove the ".001" extension
-    $splitFiles = Get-ChildItem "$folderPath\$outputFileBaseName.part.*"
-    foreach ($splitFile in $splitFiles) {
-        $newFileName = $splitFile.FullName.Replace(".001", "")
-        Rename-Item $splitFile.FullName $newFileName
+    # Notify the user about the output file location and size
+    Write-Host "The compressed and encrypted file(s) are located in:" $folderPath
+    $outputFiles = Get-ChildItem $folderPath -Filter "${outputFileBaseName}*.${outputFileExtension}"
+    foreach ($outputFile in $outputFiles) {
+        Write-Host $outputFile.Name ("{0:N2} MB" -f ($outputFile.Length / 1MB))
     }
-
-    # Set the output file path to the first part of the split file
-    $outputFilePath = "$folderPath\$outputFileBaseName.part"
 }
-
-# Remove the ".001" extension from the final part
-$finalPartPath = "$folderPath\$outputFileBaseName.part"
-Rename-Item "$outputFilePath" -NewName "$finalPartPath$outputFileExtension"
+elseif ((Get-Item $outputFilePath).Length -le $maxFileSize) {
+    # Notify the user about the output file location and size
+    Write-Host "The compressed and encrypted file is located in:" $outputFilePath
+    $outputFile = Get-Item $outputFilePath
+    Write-Host $outputFile.Name ("{0:N2} MB") -f ($outputFile.Length / 1MB)
+}
