@@ -20,7 +20,7 @@ Please for back up your keys, if you do not your storage will be for naught do n
 
 # Resources: 
 ```
-https://7-zip.org/download.html
+https://7-zip.org/download.html (Install on windows before running script this is used for the file operations)
 https://github.com/Nekmo/telegram-upload pip3 install -U telegram-upload
 https://my.telegram.org/apps (ID Values)
 https://docs.telethon.dev/en/stable/ (Telethon) pip3 install telethon
