@@ -34,6 +34,10 @@ SS: Represents the second with two digits (e.g., 06).
 Therefore, the date and time in the file name "backup-20230312_132606" represents March 12, 2023, at 1:26:06 PM.
 ```
 
+# What does TSA stand for?
+
+TSA stands for TeleSync Archive
+
 # Resources: 
 ```
 https://7-zip.org/download.html (Install on windows before running script this is used for the file operations)
