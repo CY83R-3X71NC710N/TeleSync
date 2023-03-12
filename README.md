@@ -19,4 +19,5 @@ Please for back up your keys, if you do not your storage will be for naught do n
 https://t.me/get_id_bot (Get Chat ID)
 https://telegram.me/BotFather (Get Bot Token)
 https://pypi.org/project/python-telegram-bot/ pip install python-telegram-bot==13.7 (This specific version is used in the project)
+https://7-zip.org/download.html
 ```
