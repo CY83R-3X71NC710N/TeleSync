@@ -1,6 +1,6 @@
 @echo off
 :loop
 powershell ./main.ps1
-python upload.py
+powershell ./upload.ps1
 timeout /t 86400 /nobreak >nul
 goto loop
