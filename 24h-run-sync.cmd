@@ -9,6 +9,7 @@ IF %ERRORLEVEL% EQU 0 (
     exit /b 1
 )
 
+cd /d "%~dp0"
 :loop
 powershell ./main.ps1
 python create-channel.py
