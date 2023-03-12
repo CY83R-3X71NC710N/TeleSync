@@ -12,7 +12,7 @@ Create code for a telegram script in python that grabs all files in a directory 
 
 # How to get started?
 
-Update all the variable values in the script with your values and then run the 24h-run-sync.cmd file for the first time you should answer the first-time-run questios and then it should become automatic every 24h as long as the .cmd script is open. You are able to run this script on a server if needed.
+Update all the variable values in the script with your values and then run the 24h-run-sync.cmd file for the first time you should answer the first-time-run questios and then it should become automatic every 24h as long as the .cmd script is open. You are able to run this script on a server if needed. The more you add to the sync folder the more that gets encrypted and then uploaded every 24 hours.
 
 # Warning:
 
