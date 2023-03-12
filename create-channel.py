@@ -1,9 +1,9 @@
 from datetime import datetime
 from telethon import TelegramClient, functions
 
-api_id = YOUR_API_ID_HERE
-api_hash = 'YOUR_API_HASH_HERE'
-phone = 'YOUR_PHONE_NUMBER_HERE'
+api_id = 
+api_hash = ''
+phone = ''
 
 client = TelegramClient('session_name', api_id, api_hash)
 
@@ -26,7 +26,7 @@ async def main():
 
     # Store the invite link in a text file
     with open("channel_invite_link.txt", "w") as f:
-        f.write(f"{invite_link}\n")
+        f.write(f"{invite_link.link}\n")
 
     # Print the result
     print(f"Channel '{result.chats[0].title}' (id: {result.chats[0].id}) created successfully.")
