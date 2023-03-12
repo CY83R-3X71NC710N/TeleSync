@@ -2,7 +2,7 @@
 Unlimited storage utilizing telegram with folder sync and file splitting. Fast CLI Interface.
 
 # Why create this?
-To clarify, many other solutions for backups are not "set and forget," which can be problematic because backups need to be consistently run on a schedule. That's why I created Telesync, which combines AES encrypted files, file splitting, folder sync, and scheduled runs into a single Python script for a more efficient and reliable backup system.
+To clarify, many other solutions for backups are not "set and forget," which can be problematic because backups need to be consistently run on a schedule. That's why I created Telesync, which combines AES encrypted files, file splitting, folder sync, and scheduled runs into a single that combines all of the features together for a more efficient and reliable backup system.
 
 # Platforms?:
 Currently this is windows only but if it gains enough traction I will bring it over to GNU/Linux and MacOS.
