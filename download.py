@@ -1,0 +1,1 @@
+# Python script to download files uploaded to telegram if in parts or indvidually. (We could do this by creating a channel specifically for the upload and then in this script downloading everything in that channel)
