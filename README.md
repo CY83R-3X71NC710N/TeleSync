@@ -10,6 +10,10 @@ Currently this is windows only but if it gains enough traction I will bring it o
 # Goal:
 Create code for a telegram script in python that grabs all files in a directory encrypts them and them uploads the files to telegram, however the files should be split into mutiple files if they are above 1.9GB and the script should ask questions such as if you would like to upload or decrypt a file. Decryption should take a file that was uploaded to telegram and decrypt it based on the file location. The script should sync every hour using a batch script.
 
+# Warning:
+
+Please for back up your keys, if you do not your storage will be for naught do not back them up on telegram back them up on an external private cloud solution. You do not need much storage to back your keys up.
+
 # Resources: 
 ```
 https://t.me/get_id_bot (Get Chat ID)
