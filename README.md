@@ -36,7 +36,7 @@ Therefore, the date and time in the file name "backup-20230312_132606" represent
 
 # What does TSA stand for?
 
-TSA stands for TeleSync Archive
+TSA stands for TeleSync Archive and is in the preview of the files you upload.
 
 # Resources: 
 ```
