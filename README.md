@@ -19,7 +19,7 @@ Preferably git clone this repo on the C drive top layer root "/"
 
 # Warning:
 
-Please for back up your keys, if you do not your storage will be for naught do not back them up on telegram back them up on an external private cloud solution. You do not need much storage to back your keys up.
+Please back up your keys, if you do not your storage will be for naught do not back them up on telegram back them up on an external private cloud solution. You do not need much storage to back your keys up.
 
 # What is the channel name format?:
 ```
